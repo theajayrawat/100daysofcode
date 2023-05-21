@@ -1,0 +1,108 @@
+Basic Aggregate Functions
+
+620. Not Boring Movies
+https://leetcode.com/problems/not-boring-movies/?envType=study-plan-v2&id=top-sql-50
+SELECT * FROM Cinema 
+WHERE id%2<>0 AND description<>'boring'
+ORDER BY rating DESC
+
+1251. Average Selling Price
+https://leetcode.com/problems/average-selling-price/?envType=study-plan-v2&id=top-sql-50
+SELECT DISTINCT p.product_id, ROUND(SUM(price * units) / SUM(units), 2) AS average_price FROM
+Prices AS p join UnitsSold AS U ON
+p.product_id  = u.product_id AND u.purchase_date BETWEEN p.start_date AND p.end_date
+GROUP BY p.product_id
+
+1075. Project Employees I
+https://leetcode.com/problems/project-employees-i/?envType=study-plan-v2&id=top-sql-50
+SELECT DISTINCT p.project_id, ROUND(AVG(e.experience_years), 2) AS average_years FROM
+Project AS p join Employee AS e ON
+p.employee_id = e.employee_id
+GROUP BY p.project_id
+
+1633. Percentage of Users Attended a Contest
+https://leetcode.com/problems/percentage-of-users-attended-a-contest/?envType=study-plan-v2&id=top-sql-50
+SELECT r.contest_id, ROUND(COUNT(DISTINCT R.USER_ID)/(SELECT COUNT(*) FROM USERS)*100, 2) 
+AS percentage FROM Users AS u join Register AS r ON u.user_id=r.user_id 
+WHERE r.user_id IS NOT NULL GROUP BY r.contest_id ORDER BY percentage DESC, contest_id
+
+1211. Queries Quality and Percentage
+https://leetcode.com/problems/queries-quality-and-percentage/?envType=study-plan-v2&id=top-sql-50
+SELECT query_name, ROUND(AVG(rating/position), 2) AS quality, 
+ROUND(AVG(rating < 3)*100, 2) AS poor_query_percentage  FROM Queries
+GROUP BY  query_name
+
+1193. Monthly Transactions I
+https://leetcode.com/problems/monthly-transactions-i/?envType=study-plan-v2&id=top-sql-50
+SELECT DATE_FORMAT(trans_date, '%Y-%m') AS month,
+       country,
+       COUNT(*) AS trans_count,
+       SUM(state = 'approved') AS approved_count,
+       SUM(amount) AS trans_total_amount,
+       SUM(IF(state = 'approved', amount, 0)) AS approved_total_amount
+FROM Transactions
+GROUP BY month, country;
+
+1174. Immediate Food Delivery II
+https://leetcode.com/problems/immediate-food-delivery-ii/?envType=study-plan-v2&id=top-sql-50
+SELECT ROUND(SUM(CASE WHEN order_date=customer_pref_delivery_date THEN 1 ELSE 0 END)*100/COUNT(*),2) AS immediate_percentage
+FROM Delivery
+WHERE (customer_id,order_date) IN (SELECT customer_id,MIN(order_date) FROM Delivery GROUP BY customer_id)
+
+
+550. Game Play Analysis IV
+https://leetcode.com/problems/game-play-analysis-iv/?envType=study-plan-v2&id=top-sql-50
+SELECT ROUND(COUNT(t2.player_id)/COUNT(t1.player_id),2) AS fraction
+FROM
+(SELECT player_id, MIN(event_date) AS first_login FROM Activity GROUP BY player_id) t1 
+LEFT JOIN Activity t2 ON t1.player_id = t2.player_id AND t1.first_login = t2.event_date - 1
+
+
+Advanced String Functions / Regex / Clause
+
+1667. Fix Names in a Table
+https://leetcode.com/problems/fix-names-in-a-table/?envType=study-plan-v2&id=top-sql-50
+SELECT user_id,CONCAT(UPPER(SUBSTR(name,1,1)),LOWER(SUBSTR(name,2))) AS name
+FROM Users ORDER BY user_id;
+
+1527. Patients With a Condition
+https://leetcode.com/problems/patients-with-a-condition/?envType=study-plan-v2&id=top-sql-50
+SELECT * FROM Patients 
+WHERE conditions LIKE 'DIAB1%' OR conditions LIKE '% DIAB1%'
+
+196. Delete Duplicate Emails
+https://leetcode.com/problems/delete-duplicate-emails/?envType=study-plan-v2&id=top-sql-50
+DELETE p1 FROM person p1,person p2 
+WHERE p1.email=p2.email AND p1.id>p2.id;
+
+176. Second Highest Salary
+https://leetcode.com/problems/second-highest-salary/?envType=study-plan-v2&id=top-sql-50
+SELECT DISTINCT MAX(salary) AS SecondHighestSalary
+FROM Employee a
+WHERE Salary<(SELECT MAX(salary) FROM Employee b WHERE b.salary > a.salary)
+
+1484. Group Sold Products By The Date
+https://leetcode.com/problems/group-sold-products-by-the-date/?envType=study-plan-v2&id=top-sql-50
+SELECT sell_date, COUNT(distinct product) as num_sold, GROUP_CONCAT(distinct product ) AS products
+FROM activities GROUP BY sell_date ORDER BY sell_date
+
+1327. List the Products Ordered in a Period
+https://leetcode.com/problems/list-the-products-ordered-in-a-period/?envType=study-plan-v2&id=top-sql-50
+SELECT p.product_name , SUM(o.unit) as unit
+FROM Products AS p LEFT JOIN Orders as o ON p.product_id =o.product_id 
+WHERE  DATE_FORMAT(o.order_date ,"%c")=2 
+GROUP BY p.product_id 
+HAVING unit>=100
+
+1517. Find Users With Valid E-Mails
+https://leetcode.com/problems/find-users-with-valid-e-mails/?envType=study-plan-v2&id=top-sql-50
+SELECT * FROM Users
+WHERE mail REGEXP '^[a-zA-Z][a-zA-Z0-9_.-]*@leetcode[.]com$';
+
+
+
+
+
+
+
+
