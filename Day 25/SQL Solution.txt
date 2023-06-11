@@ -1,0 +1,115 @@
+1978.Employees Whose Manager Left the Company
+https://leetcode.com/problems/employees-whose-manager-left-the-company/?envType=study-plan-v2&envId=top-sql-50
+SELECT employee_id FROM Employees
+WHERE manager_id NOT IN (SELECT employee_id FROM Employees)
+AND salary < 30000
+ORDER BY employee_id;
+
+
+626. Exchange Seats
+https://leetcode.com/problems/exchange-seats/?envType=study-plan-v2&envId=top-sql-50
+SELECT (CASE WHEN MOD(id,2)=1 AND id!=(SELECT COUNT(*) FROM seat) THEN id+1
+WHEN MOD(id,2)=0 THEN id-1
+ELSE id END)id, student
+FROM seat ORDER BY id
+
+
+1341. Movie Rating
+https://leetcode.com/problems/movie-rating/?envType=study-plan-v2&envId=top-sql-50
+with cte1 as
+(
+select count(a.user_id) as count,b.name from MovieRating a
+join Users b
+on a.user_id=b.user_id
+group by a.user_id
+order by count Desc ,b.name Asc
+Limit 1
+),
+cte2 as
+(
+  SELECT title, AVG(rating) FROM Movies a join MovieRating b on 
+  a.movie_id=b.movie_id
+		where created_at Like '2020-02%'
+		GROUP BY a.movie_id
+		ORDER BY AVG(rating) DESC,title Asc
+		Limit 1
+)
+
+SELECT name as results from cte1
+UNION ALL
+SELECT title as results from cte2;
+
+
+
+1321. Restaurant Growth
+https://leetcode.com/problems/restaurant-growth/?envType=study-plan-v2&envId=top-sql-50
+SELECT a.visited_on AS visited_on, SUM(b.day_sum) AS amount,
+       ROUND(AVG(b.day_sum), 2) AS average_amount
+FROM
+  (SELECT visited_on, SUM(amount) AS day_sum FROM Customer GROUP BY visited_on ) a,
+  (SELECT visited_on, SUM(amount) AS day_sum FROM Customer GROUP BY visited_on ) b
+WHERE DATEDIFF(a.visited_on, b.visited_on) BETWEEN 0 AND 6
+GROUP BY a.visited_on
+HAVING COUNT(b.visited_on) = 7
+
+
+602. Friend Requests II: Who Has the Most Friends
+https://leetcode.com/problems/friend-requests-ii-who-has-the-most-friends/?envType=study-plan-v2&envId=top-sql-50
+select requester_id as id,
+       (select count(*) from RequestAccepted
+            where id=requester_id or id=accepter_id) as num
+from RequestAccepted
+group by requester_id
+UNION ALL
+select accepter_id as id,
+       (select count(*) from RequestAccepted
+            where id=requester_id or id=accepter_id) as num
+from RequestAccepted
+group by accepter_id
+order by num desc limit 1
+
+
+585. Investments in 2016
+https://leetcode.com/problems/investments-in-2016/?envType=study-plan-v2&envId=top-sql-50
+SELECT
+    ROUND(SUM(insurance.TIV_2016),2) AS TIV_2016
+FROM
+    insurance
+WHERE
+    insurance.TIV_2015 IN
+    (
+      SELECT
+        TIV_2015
+      FROM
+        insurance
+      GROUP BY TIV_2015
+      HAVING COUNT(*) > 1
+    )
+    AND CONCAT(LAT, LON) IN
+    (
+      SELECT
+        CONCAT(LAT, LON)
+      FROM
+        insurance
+      GROUP BY LAT , LON
+      HAVING COUNT(*) = 1
+    )
+
+
+185. Department Top Three Salaries
+https://leetcode.com/problems/department-top-three-salaries/?envType=study-plan-v2&envId=top-sql-50
+SELECT
+    d.Name AS 'Department', e1.Name AS 'Employee', e1.Salary
+FROM
+    Employee e1
+        JOIN
+    Department d ON e1.DepartmentId = d.Id
+WHERE
+    3 > (SELECT
+            COUNT(DISTINCT e2.Salary)
+        FROM
+            Employee e2
+        WHERE
+            e2.Salary > e1.Salary
+                AND e1.DepartmentId = e2.DepartmentId
+        )
